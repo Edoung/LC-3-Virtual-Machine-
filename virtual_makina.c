@@ -144,7 +144,7 @@ int read_image(const char* image_path){
   return 1;
 }
 
-void memory_write(uint16_t address, uint16_t val){
+void mem_write(uint16_t address, uint16_t val){
   memory[address] = val;
 }
 
@@ -299,22 +299,23 @@ int main(int argc,const char* argv[]){
 	      uint16_t sr = (instr >> 9) & 0x7; // SR
 	      uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
 	      
-	      memory[mem_read(reg[R_PC] + pc_offset)] = reg[sr];	    
+	      // memory[reg[R_PC] + pc_offset] = reg[sr];
+	      mem_write(reg[R_PC] + pc_offset, reg[sr]);	    
               break;
 	}
       case OP_STI: {
 	      uint16_t sr = (instr >> 9) & 0x7; // SR
 	      uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
 
-	      memory[mem_read(mem_read(reg[R_PC] + pc_offset))] = reg[sr];
+	      mem_write(mem_read(reg[R_PC] + pc_offset), reg[sr]);
               break;
 	}
       case OP_STR: {
 	      uint16_t sr = (instr >> 9) & 0x7; // SR
 	      uint16_t br = (instr >> 6) & 0x7; // Base Register
-	      uint16_t offset6 = sign_extend(instr & 0x1F, 6); // offset
+	      uint16_t offset6 = sign_extend(instr & 0x3F, 6); // offset
 	      
-	      memory[reg[br] + offset6] = reg[sr];
+	      mem_write(reg[br] + offset6, reg[sr]);
               break;
 	}
       case OP_TRAP: {
